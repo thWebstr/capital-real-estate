@@ -256,7 +256,7 @@ export default function MarketDashboard() {
   );
 
   return (
-    <div>
+    <section className="market-dashboard full-bleed">
       <div style={{
         marginBottom: '2rem',
         animation: 'fadeInDown 0.5s ease-out',
@@ -377,6 +377,6 @@ export default function MarketDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

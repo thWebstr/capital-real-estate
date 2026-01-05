@@ -6,7 +6,7 @@ import { useFilters } from '../contexts/FilterContext';
 export default function Header() {
   const { theme, toggleTheme, isDark } = useTheme();
   const { favoritesCount } = useFavorites();
-  const { searchQuery, setSearchQuery } = useFilters();
+  const { searchQuery, setSearchQuery, isFilterOpen, toggleFilter, closeFilter } = useFilters();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Header show/hide on scroll
@@ -48,6 +48,15 @@ export default function Header() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, [isMenuOpen]);
+
+  useEffect(() => {
+    const onClose = () => {
+      if (isFilterOpen) closeFilter();
+    };
+
+    window.addEventListener('closeFilters', onClose);
+    return () => window.removeEventListener('closeFilters', onClose);
+  }, [isFilterOpen, closeFilter]);
 
   return (
     <header
@@ -285,6 +294,28 @@ export default function Header() {
             title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
           >
             <i className={`fas ${isDark ? 'fa-sun' : 'fa-moon'}`} style={{ fontSize: '1.1rem' }}></i>
+          </button>
+
+          {/* Mobile Filter Toggle */}
+          <button
+            onClick={() => { toggleFilter(); setIsHidden(false); }}
+            style={{
+              display: window.innerWidth < 768 ? 'flex' : 'none',
+              background: 'var(--bg-secondary)',
+              border: 'none',
+              borderRadius: 'var(--radius-md)',
+              padding: '0.5rem 0.6rem',
+              cursor: 'pointer',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-primary)',
+              width: '40px',
+              height: '40px',
+              marginRight: '0.5rem'
+            }}
+            title="Filters"
+          >
+            <i className="fas fa-filter" style={{ fontSize: '1.05rem' }}></i>
           </button>
 
           {/* Mobile Menu Toggle */}

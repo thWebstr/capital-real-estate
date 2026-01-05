@@ -23,6 +23,11 @@ export function FilterProvider({ children }) {
   const [filteredProperties, setFilteredProperties] = useState(properties);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Mobile filter drawer state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const toggleFilter = () => setIsFilterOpen(prev => !prev);
+  const closeFilter = () => setIsFilterOpen(false);
+
   useEffect(() => {
     localStorage.setItem('propertyFilters', JSON.stringify(filters));
 
@@ -133,7 +138,11 @@ export function FilterProvider({ children }) {
     updateFilter,
     clearFilters,
     totalCount: properties.length,
-    filteredCount: filteredProperties.length
+    filteredCount: filteredProperties.length,
+    // Drawer controls
+    isFilterOpen,
+    toggleFilter,
+    closeFilter
   };
 
   return (
