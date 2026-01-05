@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useFilters } from '../contexts/FilterContext';
@@ -9,19 +9,63 @@ export default function Header() {
   const { searchQuery, setSearchQuery } = useFilters();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Header show/hide on scroll
+  const [isHidden, setIsHidden] = useState(false);
+  const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0);
+  const ticking = useRef(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      // Don't hide when mobile menu is open
+      if (isMenuOpen) {
+        setIsHidden(false);
+        lastScrollY.current = window.scrollY;
+        return;
+      }
+
+      if (!ticking.current) {
+        ticking.current = true;
+        window.requestAnimationFrame(() => {
+          const current = window.scrollY;
+
+          // Always show near top
+          if (current <= 50) {
+            setIsHidden(false);
+          } else if (current > lastScrollY.current && current > 100) {
+            // Scrolling down
+            setIsHidden(true);
+          } else if (current < lastScrollY.current) {
+            // Scrolling up
+            setIsHidden(false);
+          }
+
+          lastScrollY.current = current;
+          ticking.current = false;
+        });
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isMenuOpen]);
+
   return (
-    <header style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 'var(--z-sticky)',
-      background: isDark 
-        ? 'rgba(15, 23, 42, 0.95)' 
-        : 'rgba(255, 255, 255, 0.95)',
-      backdropFilter: 'blur(10px)',
-      borderBottom: `1px solid var(--border-color)`,
-      boxShadow: 'var(--shadow-md)',
-      transition: 'all var(--transition-normal)'
-    }}>
+    <header
+      aria-hidden={isHidden}
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 'var(--z-sticky)',
+        background: isDark
+          ? 'rgba(15, 23, 42, 0.95)'
+          : 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: `1px solid var(--border-color)`,
+        boxShadow: isHidden ? 'none' : 'var(--shadow-md)',
+        transition: 'transform var(--transition-normal), box-shadow var(--transition-normal), background var(--transition-normal)',
+        transform: isHidden ? 'translateY(-110%)' : 'translateY(0)',
+        willChange: 'transform'
+      }}>
       <div className="container" style={{
         display: 'flex',
         alignItems: 'center',
@@ -37,8 +81,8 @@ export default function Header() {
           cursor: 'pointer',
           transition: 'transform var(--transition-fast)'
         }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
           <div style={{
             width: '40px',
@@ -245,7 +289,7 @@ export default function Header() {
 
           {/* Mobile Menu Toggle */}
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={() => { setIsMenuOpen(prev => !prev); setIsHidden(false); }}
             style={{
               display: window.innerWidth < 768 ? 'flex' : 'none',
               background: 'var(--bg-secondary)',

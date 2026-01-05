@@ -20,8 +20,8 @@ export default function Hero() {
     <section style={{
       position: 'relative',
       background: isDark
-        ? 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)'
-        : 'linear-gradient(135deg, #1C3D5A 0%, #2a5a82 50%, #4A90E2 100%)',
+        ? 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--primary-dark) 100%)'
+        : 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 40%, rgba(201,162,77,0.06) 65%, var(--primary-light) 100%)',
       padding: '5rem 0 4rem',
       overflow: 'hidden'
     }}>
@@ -32,7 +32,7 @@ export default function Hero() {
         right: '10%',
         width: '300px',
         height: '300px',
-        background: 'radial-gradient(circle, rgba(74, 144, 226, 0.15) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(201, 162, 77, 0.15) 0%, transparent 70%)',
         borderRadius: '50%',
         animation: 'pulse 4s ease-in-out infinite',
         pointerEvents: 'none'
@@ -43,7 +43,7 @@ export default function Hero() {
         left: '5%',
         width: '250px',
         height: '250px',
-        background: 'radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(201, 162, 77, 0.15) 0%, transparent 70%)',
         borderRadius: '50%',
         animation: 'pulse 5s ease-in-out infinite 1s',
         pointerEvents: 'none'
@@ -54,7 +54,7 @@ export default function Hero() {
           textAlign: 'center',
           maxWidth: '900px',
           margin: '0 auto',
-          color: 'white',
+          color: isDark ? 'white' : 'var(--text-primary)',
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
           transition: 'all 0.8s ease-out'
@@ -64,17 +64,17 @@ export default function Hero() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.5rem',
-            background: 'rgba(255, 255, 255, 0.1)',
+            background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(10, 37, 64, 0.04)',
             backdropFilter: 'blur(10px)',
             padding: '0.5rem 1.5rem',
             borderRadius: 'var(--radius-full)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(16, 24, 40, 0.04)',
             marginBottom: '2rem',
             fontSize: '0.9rem',
             fontWeight: '500',
             animation: 'fadeIn 1s ease-out 0.2s both'
           }}>
-            <i className="fas fa-sparkles" style={{ color: '#F0C868' }}></i>
+            <i className="fas fa-sparkles" style={{ color: 'var(--secondary)' }}></i>
             <span>AI-Powered Real Estate Platform</span>
           </div>
 
@@ -89,7 +89,7 @@ export default function Hero() {
             Find Your Dream Home
             <br />
             <span style={{
-              background: 'linear-gradient(135deg, #F0C868, #D4AF37)',
+              background: 'linear-gradient(135deg, var(--secondary-light), var(--secondary))',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
@@ -101,7 +101,7 @@ export default function Hero() {
           {/* Subtitle */}
           <p style={{
             fontSize: 'clamp(1.1rem, 2vw, 1.3rem)',
-            color: 'rgba(255, 255, 255, 0.9)',
+            color: isDark ? 'rgba(255, 255, 255, 0.9)' : 'var(--text-secondary)',
             marginBottom: '3rem',
             lineHeight: '1.6',
             animation: 'fadeIn 1s ease-out 0.6s both'
@@ -149,10 +149,10 @@ export default function Hero() {
 
             <button style={{
               background: 'transparent',
-              color: 'white',
+              color: isDark ? 'white' : 'var(--text-primary)',
               padding: '1rem 2.5rem',
               borderRadius: 'var(--radius-full)',
-              border: '2px solid rgba(255, 255, 255, 0.3)',
+              border: isDark ? '2px solid rgba(255, 255, 255, 0.3)' : '2px solid rgba(16,24,40,0.08)',
               fontSize: '1.1rem',
               fontWeight: '600',
               cursor: 'pointer',
@@ -163,13 +163,13 @@ export default function Hero() {
               transition: 'all var(--transition-normal)'
             }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.borderColor = 'white';
+                e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)';
+                e.currentTarget.style.borderColor = isDark ? 'white' : 'rgba(16,24,40,0.08)';
                 e.currentTarget.style.transform = 'translateY(-3px)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(16,24,40,0.08)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}>
               <i className="fas fa-robot"></i>
@@ -190,27 +190,27 @@ export default function Hero() {
               <div
                 key={stat.label}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
+                  background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(10, 37, 64, 0.04)',
                   backdropFilter: 'blur(10px)',
                   padding: '1.5rem 1rem',
                   borderRadius: 'var(--radius-lg)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(16, 24, 40, 0.04)',
                   transition: 'all var(--transition-normal)',
                   cursor: 'default'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-5px)';
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                  e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(10, 37, 64, 0.06)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(10, 37, 64, 0.04)';
                 }}
               >
                 <i className={`fas ${stat.icon}`} style={{
                   fontSize: '2rem',
                   marginBottom: '0.5rem',
-                  color: '#F0C868'
+                  color: 'var(--secondary)'
                 }}></i>
                 <div style={{
                   fontSize: '2rem',

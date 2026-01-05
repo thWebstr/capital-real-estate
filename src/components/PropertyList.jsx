@@ -18,11 +18,15 @@ export default function PropertyList() {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '1.5rem'
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 360px))',
+      gap: '1.5rem',
+      justifyContent: 'center',
+      width: '100%'
     }}>
       {filteredProperties.map((property) => (
-        <PropertyCard key={property.id} property={property} />
+        <div style={{ width: '100%', maxWidth: '360px' }} key={property.id}>
+          <PropertyCard property={property} />
+        </div>
       ))}
     </div>
   );

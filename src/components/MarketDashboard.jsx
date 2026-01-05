@@ -57,8 +57,8 @@ export default function MarketDashboard() {
           datasets: [{
             label: 'Number of Properties',
             data: Object.values(priceRanges),
-            backgroundColor: 'rgba(74, 144, 226, 0.7)',
-            borderColor: 'rgba(74, 144, 226, 1)',
+            backgroundColor: 'rgba(201, 162, 77, 0.7)',
+            borderColor: 'rgba(201, 162, 77, 1)',
             borderWidth: 2,
             borderRadius: 8,
           }]
@@ -105,7 +105,7 @@ export default function MarketDashboard() {
           datasets: [{
             data: Object.values(typeDistribution),
             backgroundColor: [
-              'rgba(74, 144, 226, 0.8)',
+              'rgba(201, 162, 77, 0.8)',
               'rgba(212, 175, 55, 0.8)',
               'rgba(16, 185, 129, 0.8)',
               'rgba(245, 158, 11, 0.8)',
@@ -212,14 +212,14 @@ export default function MarketDashboard() {
       transition: 'all var(--transition-normal)',
       cursor: 'default',
     }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-4px)';
-      e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-    }}>
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-xl)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+      }}>
       <div style={{
         width: '60px',
         height: '60px',

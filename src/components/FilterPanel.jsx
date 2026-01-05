@@ -72,7 +72,10 @@ export default function FilterPanel() {
   );
 
   return (
-    <div style={{
+    <div className="filter-panel" style={{
+      width: '100%',
+      maxWidth: '360px',
+      boxSizing: 'border-box',
       background: 'var(--bg-primary)',
       border: '1px solid var(--border-color)',
       borderRadius: 'var(--radius-xl)',
