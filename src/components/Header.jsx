@@ -8,6 +8,18 @@ export default function Header() {
   const { favoritesCount } = useFavorites();
   const { searchQuery, setSearchQuery, isFilterOpen, toggleFilter, closeFilter } = useFilters();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+  const menuRef = useRef(null);
+  const toggleRef = useRef(null);
+
+  // small debounce helper
+  function debounce(fn, wait = 120) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), wait);
+    };
+  }
 
   // Header show/hide on scroll
   const [isHidden, setIsHidden] = useState(false);
@@ -49,6 +61,21 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, [isMenuOpen]);
 
+  // Resize handler (debounced) to switch mobile/desktop layout
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setIsMenuOpen(false);
+        document.body.style.overflow = '';
+      }
+    };
+    const debounced = debounce(handleResize, 120);
+    window.addEventListener('resize', debounced);
+    return () => window.removeEventListener('resize', debounced);
+  }, []);
+
   useEffect(() => {
     const onClose = () => {
       if (isFilterOpen) closeFilter();
@@ -57,6 +84,43 @@ export default function Header() {
     window.addEventListener('closeFilters', onClose);
     return () => window.removeEventListener('closeFilters', onClose);
   }, [isFilterOpen, closeFilter]);
+
+  // Manage menu open: scroll-lock, outside-click, Escape key, and focus management
+  useEffect(() => {
+    if (!isMenuOpen) {
+      document.body.style.overflow = '';
+      if (toggleRef.current) toggleRef.current.focus();
+      return;
+    }
+
+    document.body.style.overflow = 'hidden';
+
+    const onClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target) && !toggleRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') setIsMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', onClickOutside);
+    document.addEventListener('keydown', onKey);
+
+    // Move focus into the menu
+    setTimeout(() => {
+      if (menuRef.current) {
+        const first = menuRef.current.querySelector('button, a, input, [tabindex]:not([tabindex="-1"])');
+        if (first) first.focus();
+      }
+    }, 0);
+
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
 
   return (
     <header
@@ -131,76 +195,77 @@ export default function Header() {
         </div>
 
         {/* Search Bar - Desktop */}
-        <div style={{
-          flex: '1',
-          maxWidth: '600px',
-          display: window.innerWidth < 768 ? 'none' : 'block'
-        }}>
-          <div style={{ position: 'relative' }}>
-            <input
-              type="text"
-              placeholder="Search by city, address, or property type..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.75rem 3rem 0.75rem 3rem',
-                borderRadius: 'var(--radius-full)',
-                border: `2px solid var(--border-color)`,
-                background: 'var(--bg-secondary)',
-                fontSize: '0.95rem',
-                transition: 'all var(--transition-fast)'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'var(--accent)';
-                e.target.style.boxShadow = 'var(--shadow-glow)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'var(--border-color)';
-                e.target.style.boxShadow = 'none';
-              }}
-            />
-            <i className="fas fa-search" style={{
-              position: 'absolute',
-              left: '1rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--text-tertiary)',
-              fontSize: '1rem'
-            }}></i>
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
+        {!isMobile && (
+          <div style={{
+            flex: '1',
+            maxWidth: '600px'
+          }}>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Search by city, address, or property type..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
-                  position: 'absolute',
-                  right: '1rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-tertiary)',
-                  cursor: 'pointer',
-                  padding: '0.25rem',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: '100%',
+                  padding: '0.75rem 3rem 0.75rem 3rem',
+                  borderRadius: 'var(--radius-full)',
+                  border: `2px solid var(--border-color)`,
+                  background: 'var(--bg-secondary)',
+                  fontSize: '0.95rem',
                   transition: 'all var(--transition-fast)'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--bg-tertiary)';
-                  e.currentTarget.style.color = 'var(--text-primary)';
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--accent)';
+                  e.target.style.boxShadow = 'var(--shadow-glow)';
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'none';
-                  e.currentTarget.style.color = 'var(--text-tertiary)';
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--border-color)';
+                  e.target.style.boxShadow = 'none';
                 }}
-              >
-                <i className="fas fa-times"></i>
-              </button>
-            )}
+              />
+              <i className="fas fa-search" style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-tertiary)',
+                fontSize: '1rem'
+              }}></i>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: '1rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-tertiary)',
+                    cursor: 'pointer',
+                    padding: '0.25rem',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all var(--transition-fast)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--bg-tertiary)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'none';
+                    e.currentTarget.style.color = 'var(--text-tertiary)';
+                  }}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Actions */}
         <div style={{
@@ -237,12 +302,11 @@ export default function Header() {
             }}
           >
             <i className="fas fa-heart" style={{ fontSize: '1.1rem' }}></i>
-            <span style={{
-              display: window.innerWidth < 768 ? 'none' : 'inline',
-              fontWeight: '500'
-            }}>
-              Favorites
-            </span>
+            {!isMobile && (
+              <span style={{ fontWeight: '500' }}>
+                Favorites
+              </span>
+            )}
             {favoritesCount > 0 && (
               <span style={{
                 position: 'absolute',
@@ -297,51 +361,128 @@ export default function Header() {
           </button>
 
           {/* Mobile Filter Toggle */}
-          <button
-            onClick={() => { toggleFilter(); setIsHidden(false); }}
-            style={{
-              display: window.innerWidth < 768 ? 'flex' : 'none',
-              background: 'var(--bg-secondary)',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.5rem 0.6rem',
-              cursor: 'pointer',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-primary)',
-              width: '40px',
-              height: '40px',
-              marginRight: '0.5rem'
-            }}
-            title="Filters"
-          >
-            <i className="fas fa-filter" style={{ fontSize: '1.05rem' }}></i>
-          </button>
+          {isMobile && (
+            <button
+              onClick={() => { toggleFilter(); setIsHidden(false); }}
+              style={{
+                background: 'var(--bg-secondary)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.5rem 0.6rem',
+                cursor: 'pointer',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-primary)',
+                width: '40px',
+                height: '40px',
+                marginRight: '0.5rem'
+              }}
+              title="Filters"
+            >
+              <i className="fas fa-filter" style={{ fontSize: '1.05rem' }}></i>
+            </button>
+          )}
 
           {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => { setIsMenuOpen(prev => !prev); setIsHidden(false); }}
-            style={{
-              display: window.innerWidth < 768 ? 'flex' : 'none',
-              background: 'var(--bg-secondary)',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.65rem 0.65rem',
-              cursor: 'pointer',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-primary)',
-              width: '40px',
-              height: '40px'
-            }}
-          >
-            <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`} style={{ fontSize: '1.1rem' }}></i>
-          </button>
+          {isMobile && (
+            <button
+              ref={toggleRef}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              onClick={() => { setIsMenuOpen(prev => !prev); setIsHidden(false); }}
+              style={{
+                background: isMenuOpen ? 'var(--accent)' : 'var(--bg-secondary)',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.65rem 0.65rem',
+                cursor: 'pointer',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: isMenuOpen ? 'white' : 'var(--text-primary)',
+                width: '40px',
+                height: '40px'
+              }}
+            >
+              <span className={`hamburger ${isMenuOpen ? 'is-open' : ''}`} aria-hidden="true">
+                <span className="bar bar1"></span>
+                <span className="bar bar2"></span>
+                <span className="bar bar3"></span>
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Mobile Search */}
-      {window.innerWidth < 768 && (
+      {/* Mobile Menu */}
+      {isMobile && isMenuOpen && (
+        <div id="mobile-menu" ref={menuRef} role="dialog" aria-modal="true" style={{
+          background: 'var(--bg-primary)',
+          borderTop: `1px solid var(--border-color)`,
+          padding: '1rem',
+          animation: 'slideInDown 0.3s ease-out'
+        }}>
+          <nav role="navigation" aria-label="Mobile menu" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem'
+          }}>
+            {['Home', 'Blog', 'About', 'Contact'].map((label) => (
+              <button
+                key={label}
+                onClick={() => { setIsMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                style={{
+                  padding: '1rem',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  border: 'none',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  fontSize: '1rem',
+                  textAlign: 'left'
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+
+          {/* Mobile Search inside menu */}
+          <div style={{ marginTop: '1rem' }}>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Search properties..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 3rem 0.75rem 3rem',
+                  borderRadius: 'var(--radius-full)',
+                  border: `2px solid var(--border-color)`,
+                  background: 'var(--bg-secondary)',
+                  fontSize: '0.95rem'
+                }}
+              />
+              <i className="fas fa-search" style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-tertiary)'
+              }}></i>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Search (visible when menu is closed) */}
+      {isMobile && !isMenuOpen && (
         <div style={{
           padding: '0 var(--space-lg) 1rem',
           borderTop: `1px solid var(--border-color)`
