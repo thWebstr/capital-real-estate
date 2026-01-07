@@ -287,7 +287,7 @@ export default function MarketDashboard() {
       }}>
         <StatCard
           icon="fas fa-dollar-sign"
-          value={`$${(avgPrice / 1000).toFixed(0)}K`}
+          value={`$ ${(avgPrice / 1000).toFixed(0)}K`}
           label="Average Price"
           color="var(--accent)"
         />
