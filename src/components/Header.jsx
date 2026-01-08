@@ -168,7 +168,7 @@ export default function Header() {
             justifyContent: 'center',
             boxShadow: 'var(--shadow-glow)'
           }}>
-            <i className="fas fa-home" style={{ color: 'white', fontSize: '1.25rem' }}></i>
+            <i className="fas fa-check-circle" style={{ color: 'white', fontSize: '1.25rem' }}></i>
           </div>
           <div>
             <h1 style={{
@@ -181,7 +181,7 @@ export default function Header() {
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
             }}>
-              Capital
+              Verified
             </h1>
             <p style={{
               fontSize: '0.75rem',
@@ -190,7 +190,7 @@ export default function Header() {
               fontWeight: '500',
               letterSpacing: '0.5px'
             }}>
-              REAL ESTATE
+              HOMES
             </p>
           </div>
         </div>
@@ -433,9 +433,7 @@ export default function Header() {
           }}>
             {[
               { label: 'Home', to: '/' },
-              { label: 'Blog', to: '/blog' },
               { label: 'Favorites', to: '/favorites' },
-              { label: 'About', to: '/about' },
               { label: 'Contact', to: '/contact' },
             ].map(({ label, to }) => (
               <Link

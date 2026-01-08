@@ -74,8 +74,8 @@ export default function Hero() {
             fontWeight: '500',
             animation: 'fadeIn 1s ease-out 0.2s both'
           }}>
-            <i className="fas fa-sparkles" style={{ color: 'var(--secondary)' }}></i>
-            <span>AI-Powered Real Estate Platform</span>
+            <i className="fas fa-check-circle" style={{ color: 'var(--success)' }}></i>
+            <span>Verified Listings Only</span>
           </div>
 
           {/* Main Heading */}
@@ -94,7 +94,7 @@ export default function Hero() {
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
             }}>
-              With AI Intelligence
+              Without The Stress
             </span>
           </h1>
 
@@ -106,9 +106,9 @@ export default function Hero() {
             lineHeight: '1.6',
             animation: 'fadeIn 1s ease-out 0.6s both'
           }}>
-            Discover luxury properties, calculate mortgages instantly, and get personalized
+            Find verified apartments and homes for rent or sale in your preferred city.
             <br />
-            recommendations from our 24/7 AI assistant.
+            No fake agents. No wasted inspections.
           </p>
 
           {/* CTA Buttons */}
@@ -147,34 +147,7 @@ export default function Hero() {
               Browse Properties
             </button>
 
-            <button style={{
-              background: 'transparent',
-              color: isDark ? 'white' : 'var(--text-primary)',
-              padding: '1rem 2.5rem',
-              borderRadius: 'var(--radius-full)',
-              border: isDark ? '2px solid rgba(255, 255, 255, 0.3)' : '2px solid rgba(16,24,40,0.08)',
-              fontSize: '1.1rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              backdropFilter: 'blur(10px)',
-              transition: 'all var(--transition-normal)'
-            }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.03)';
-                e.currentTarget.style.borderColor = isDark ? 'white' : 'rgba(16,24,40,0.08)';
-                e.currentTarget.style.transform = 'translateY(-3px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(16,24,40,0.08)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}>
-              <i className="fas fa-robot"></i>
-              Try AI Assistant
-            </button>
+
           </div>
 
           {/* Stats */}

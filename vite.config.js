@@ -15,13 +15,12 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
-          'charts': ['chart.js', 'react-chartjs-2'],
           'maps': ['@googlemaps/js-api-loader'],
         },
       },
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'chart.js', 'react-chartjs-2'],
+    include: ['react', 'react-dom'],
   },
 })

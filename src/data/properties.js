@@ -14,6 +14,7 @@ export const properties = [
     yearBuilt: 2020,
     propertyType: "House",
     status: "For Sale",
+    verified: true,
     daysOnMarket: 12,
     hoa: 450,
     features: ["Pool", "Garage", "Ocean View", "Smart Home", "Chef's Kitchen"],
@@ -27,7 +28,8 @@ export const properties = [
       name: "Sarah Johnson",
       phone: "(305) 555-0123",
       email: "sarah.j@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=1"
+      photo: "https://i.pravatar.cc/150?img=1",
+      verified: true
     },
     lat: 25.7907,
     lng: -80.1300
@@ -47,6 +49,7 @@ export const properties = [
     yearBuilt: 2019,
     propertyType: "Condo",
     status: "For Sale",
+    verified: true,
     daysOnMarket: 8,
     hoa: 650,
     features: ["Garage", "Gym", "Doorman", "Rooftop Terrace", "City View"],
@@ -60,7 +63,8 @@ export const properties = [
       name: "Michael Chen",
       phone: "(312) 555-0456",
       email: "michael.c@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=12"
+      photo: "https://i.pravatar.cc/150?img=12",
+      verified: true
     },
     lat: 41.8781,
     lng: -87.6298
@@ -80,6 +84,7 @@ export const properties = [
     yearBuilt: 2015,
     propertyType: "House",
     status: "For Sale",
+    verified: true,
     daysOnMarket: 25,
     hoa: 0,
     features: ["Garden", "Fireplace", "Updated Kitchen", "Hardwood Floors", "Deck"],
@@ -93,7 +98,8 @@ export const properties = [
       name: "Emily Rodriguez",
       phone: "(512) 555-0789",
       email: "emily.r@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=5"
+      photo: "https://i.pravatar.cc/150?img=5",
+      verified: true
     },
     lat: 30.2672,
     lng: -97.7431
@@ -113,6 +119,7 @@ export const properties = [
     yearBuilt: 2018,
     propertyType: "Townhouse",
     status: "For Sale",
+    verified: true,
     daysOnMarket: 18,
     hoa: 325,
     features: ["Garage", "Rooftop Deck", "Central AC", "Smart Home", "Walk-in Closets"],
@@ -126,7 +133,8 @@ export const properties = [
       name: "David Park",
       phone: "(206) 555-0234",
       email: "david.p@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=8"
+      photo: "https://i.pravatar.cc/150?img=8",
+      verified: true
     },
     lat: 47.6062,
     lng: -122.3321
@@ -159,7 +167,8 @@ export const properties = [
       name: "Alexandra Santos",
       phone: "(310) 555-0567",
       email: "alex.s@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=9"
+      photo: "https://i.pravatar.cc/150?img=9",
+      verified: true
     },
     lat: 34.0259,
     lng: -118.7798
@@ -192,7 +201,8 @@ export const properties = [
       name: "Robert Martinez",
       phone: "(303) 555-0890",
       email: "robert.m@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=13"
+      photo: "https://i.pravatar.cc/150?img=13",
+      verified: true
     },
     lat: 39.7392,
     lng: -104.9903
@@ -225,7 +235,8 @@ export const properties = [
       name: "Jennifer Lee",
       phone: "(718) 555-0123",
       email: "jennifer.l@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=10"
+      photo: "https://i.pravatar.cc/150?img=10",
+      verified: true
     },
     lat: 40.6782,
     lng: -73.9442
@@ -258,7 +269,8 @@ export const properties = [
       name: "Kevin Patel",
       phone: "(408) 555-0456",
       email: "kevin.p@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=14"
+      photo: "https://i.pravatar.cc/150?img=14",
+      verified: true
     },
     lat: 37.3382,
     lng: -121.8863
@@ -290,7 +302,8 @@ export const properties = [
       name: "Laura Kim",
       phone: "(919) 555-0909",
       email: "laura.k@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=15"
+      photo: "https://i.pravatar.cc/150?img=15",
+      verified: true
     },
     lat: 35.7796,
     lng: -78.6382
@@ -322,7 +335,8 @@ export const properties = [
       name: "Chris Nolan",
       phone: "(503) 555-0666",
       email: "chris.n@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=16"
+      photo: "https://i.pravatar.cc/150?img=16",
+      verified: true
     },
     lat: 45.5152,
     lng: -122.6784
@@ -353,7 +367,8 @@ export const properties = [
       name: "Olivia Park",
       phone: "(614) 555-0199",
       email: "olivia.p@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=17"
+      photo: "https://i.pravatar.cc/150?img=17",
+      verified: true
     },
     lat: 39.9612,
     lng: -82.9988
@@ -384,7 +399,8 @@ export const properties = [
       name: "Ethan Wright",
       phone: "(530) 555-0345",
       email: "ethan.w@capitalre.com",
-      photo: "https://i.pravatar.cc/150?img=18"
+      photo: "https://i.pravatar.cc/150?img=18",
+      verified: true
     },
     lat: 39.0968,
     lng: -120.0324

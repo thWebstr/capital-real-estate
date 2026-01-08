@@ -12,8 +12,6 @@ export function FilterProvider({ children }) {
       bedrooms: null,
       bathrooms: null,
       propertyTypes: [],
-      sqftMin: 0,
-      sqftMax: 10000,
       features: [],
       cities: [],
       sortBy: 'newest'
@@ -66,10 +64,8 @@ export function FilterProvider({ children }) {
       );
     }
 
-    // Square footage
-    filtered = filtered.filter(prop =>
-      prop.sqft >= filters.sqftMin && prop.sqft <= filters.sqftMax
-    );
+    // Square footage removed from MVP logic
+
 
     // Features
     if (filters.features.length > 0) {
@@ -121,8 +117,6 @@ export function FilterProvider({ children }) {
       bedrooms: null,
       bathrooms: null,
       propertyTypes: [],
-      sqftMin: 0,
-      sqftMax: 10000,
       features: [],
       cities: [],
       sortBy: 'newest'

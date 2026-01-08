@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import PropertyCard from './PropertyCard';
 import MapView from './MapView';
+import supabase from '../supabaseClient';
 import { useFavorites } from '../contexts/FavoritesContext';
 
 export default function SearchPanel() {
@@ -43,9 +44,31 @@ export default function SearchPanel() {
     setLoading(true);
     setError(null);
     try {
-      const r = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4200'}/search?${params.toString()}`);
-      if (!r.ok) throw new Error('Search API error');
-      const data = await r.json();
+      let data, count;
+
+      // Try Supabase first
+      try {
+        let query = supabase.from('properties').select('*', { count: 'exact' });
+
+        if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`);
+        if (city) query = query.ilike('city', `%${city}%`);
+        if (priceMax) query = query.lte('price', priceMax);
+        if (bedrooms) query = query.gte('bedrooms', bedrooms);
+
+        query = query.range((opts.page || 1) * (opts.perPage || 12) - (opts.perPage || 12), (opts.page || 1) * (opts.perPage || 12) - 1);
+
+        const { data: sbData, error: sbError, count: sbCount } = await query;
+
+        if (sbError) throw sbError;
+
+        data = { hits: sbData.map(d => ({ document: d })), found: sbCount };
+      } catch (sbErr) {
+        console.warn('Supabase fetch failed, falling back to legacy API/Local:', sbErr);
+        // Legacy API fallback (optional, or just go to local)
+        const r = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4200'}/search?${params.toString()}`);
+        if (!r.ok) throw new Error('Search API error');
+        data = await r.json();
+      }
       const hits = data.hits ? data.hits.map(h => h.document) : data.documents || [];
       setResults(hits);
       setTotal(data.found || hits.length);
@@ -250,12 +273,17 @@ export default function SearchPanel() {
           {/* Modal */}
           {selectedProperty && (
             <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)' }}>
-              <h3>{selectedProperty.title} — {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(selectedProperty.price)}</h3>
+              <h3>
+                {selectedProperty.verified && <i className="fas fa-check-circle" style={{ color: 'var(--info)', marginRight: '0.5rem' }} title="Verified Listing"></i>}
+                {selectedProperty.title} — {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(selectedProperty.price)}
+              </h3>
               <p style={{ color: 'var(--text-secondary)' }}>{selectedProperty.address} {selectedProperty.city ? '• ' + selectedProperty.city : ''}</p>
               <p>{selectedProperty.description}</p>
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
                 <button onClick={() => { addFavorite(selectedProperty.id); }} style={{ padding: '0.6rem 0.9rem', borderRadius: '8px', background: 'var(--accent)', color: 'white', border: 'none' }}>Add to Favorites</button>
-                <button onClick={() => { window.location.href = '/contact'; }} style={{ padding: '0.6rem 0.9rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>Request Tour</button>
+                <button onClick={() => { window.open(`https://wa.me/?text=I am interested in ${selectedProperty.title}`, '_blank'); }} style={{ padding: '0.6rem 0.9rem', borderRadius: '8px', border: 'none', background: 'var(--success)', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <i className="fab fa-whatsapp"></i> Contact Verified Agent
+                </button>
                 <button onClick={() => setSelectedProperty(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer' }}>Close</button>
               </div>
             </div>

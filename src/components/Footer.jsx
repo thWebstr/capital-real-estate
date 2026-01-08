@@ -3,14 +3,9 @@ export default function Footer() {
 
   const footerLinks = {
     company: [
-      { name: 'About Us', href: '#' },
-      { name: 'Careers', href: '#' },
-      { name: 'Press', href: '#' },
       { name: 'Contact', href: '#' },
     ],
     resources: [
-      { name: 'Blog', href: '#' },
-      { name: 'Market Trends', href: '#' },
       { name: 'Buying Guide', href: '#' },
       { name: 'Selling Guide', href: '#' },
     ],
@@ -63,7 +58,7 @@ export default function Footer() {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <i className="fas fa-home" style={{ color: 'white', fontSize: '1.25rem' }}></i>
+                <i className="fas fa-check-circle" style={{ color: 'white', fontSize: '1.25rem' }}></i>
               </div>
               <div>
                 <h3 style={{
@@ -75,7 +70,7 @@ export default function Footer() {
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
                 }}>
-                  Capital
+                  Verified
                 </h3>
                 <p style={{
                   fontSize: '0.7rem',
@@ -84,7 +79,7 @@ export default function Footer() {
                   fontWeight: '600',
                   letterSpacing: '1px',
                 }}>
-                  REAL ESTATE
+                  HOMES
                 </p>
               </div>
             </div>
@@ -94,8 +89,8 @@ export default function Footer() {
               lineHeight: '1.6',
               marginBottom: '1.5rem',
             }}>
-              AI-powered real estate platform helping you find your dream home with intelligent search,
-              market insights, and 24/7 assistance.
+              Verified properties only. No fake listings, no stress.
+              Find your next home with confidence.
             </p>
             {/* Social Links */}
             <div style={{
@@ -358,7 +353,7 @@ export default function Footer() {
             fontSize: '0.9rem',
             margin: 0,
           }}>
-            © {currentYear} Capital Real Estate. All rights reserved.
+            © {currentYear} Verified Homes. All rights reserved.
           </p>
           <div style={{
             display: 'flex',

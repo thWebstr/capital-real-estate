@@ -171,9 +171,7 @@ export default function PropertyCard({ property, onViewDetails }) {
             position: 'absolute',
             top: '15px',
             left: '15px',
-            background: property.status === 'For Sale'
-              ? 'var(--success)'
-              : 'var(--warning)',
+            background: property.verified ? 'var(--info)' : (property.status === 'For Sale' ? 'var(--success)' : 'var(--warning)'),
             color: 'white',
             padding: '0.4rem 0.9rem',
             borderRadius: 'var(--radius-full)',
@@ -183,8 +181,8 @@ export default function PropertyCard({ property, onViewDetails }) {
             boxShadow: 'var(--shadow-md)',
           }}
         >
-          <i className="fas fa-check-circle" style={{ marginRight: '0.3rem' }}></i>
-          {property.status}
+          <i className={property.verified ? "fas fa-check-circle" : "fas fa-tag"} style={{ marginRight: '0.3rem' }}></i>
+          {property.verified ? 'Verified' : property.status}
         </div>
 
         {/* Favorite Button */}
@@ -240,8 +238,8 @@ export default function PropertyCard({ property, onViewDetails }) {
             fontWeight: '500',
           }}
         >
-          <i className="fas fa-clock" style={{ marginRight: '0.4rem' }}></i>
-          {property.daysOnMarket} days
+          <i className="fas fa-map-marker-alt" style={{ marginRight: '0.4rem' }}></i>
+          {property.city}
         </div>
       </div>
 
@@ -444,8 +442,8 @@ export default function PropertyCard({ property, onViewDetails }) {
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            <i className="fas fa-phone"></i>
-            Contact
+            <i className="fab fa-whatsapp"></i>
+            Contact Agent
           </button>
         </div>
       </div>
