@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import PropertyCard from './PropertyCard';
-import MapView from './MapView';
-import supabase from '../supabaseClient';
+import { api } from '../services/api';
 import { useFavorites } from '../contexts/FavoritesContext';
 
 export default function SearchPanel() {
@@ -44,50 +43,26 @@ export default function SearchPanel() {
     setLoading(true);
     setError(null);
     try {
-      let data, count;
+      const filters = {
+        q,
+        city,
+        priceMax,
+        bedrooms,
+        page: opts.page || 1,
+        perPage: opts.perPage || 12
+      };
 
-      // Try Supabase first
-      try {
-        let query = supabase.from('properties').select('*', { count: 'exact' });
+      const response = await api.fetchProperties(filters);
 
-        if (q) query = query.or(`title.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%`);
-        if (city) query = query.ilike('city', `%${city}%`);
-        if (priceMax) query = query.lte('price', priceMax);
-        if (bedrooms) query = query.gte('bedrooms', bedrooms);
+      setResults(response.data);
+      setTotal(response.total);
+      setPage(response.page);
 
-        query = query.range((opts.page || 1) * (opts.perPage || 12) - (opts.perPage || 12), (opts.page || 1) * (opts.perPage || 12) - 1);
-
-        const { data: sbData, error: sbError, count: sbCount } = await query;
-
-        if (sbError) throw sbError;
-
-        data = { hits: sbData.map(d => ({ document: d })), found: sbCount };
-      } catch (sbErr) {
-        console.warn('Supabase fetch failed, falling back to legacy API/Local:', sbErr);
-        // Legacy API fallback (optional, or just go to local)
-        const r = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4200'}/search?${params.toString()}`);
-        if (!r.ok) throw new Error('Search API error');
-        data = await r.json();
-      }
-      const hits = data.hits ? data.hits.map(h => h.document) : data.documents || [];
-      setResults(hits);
-      setTotal(data.found || hits.length);
-      setPage(opts.page || 1);
-      cacheRef.current.set(cacheKey, { results: hits, total: data.found || hits.length });
+      // Cache results
+      cacheRef.current.set(cacheKey, { results: response.data, total: response.total });
     } catch (err) {
-      // Fallback to client side search using local dataset
-      console.warn('Search API failed — falling back to local results', err.message);
-      setError('Search service temporarily unavailable — showing local sample results.');
-      const local = (await import('../data/properties')).properties || (await import('../data/properties')).default;
-      let filtered = local;
-      if (city) filtered = filtered.filter(p => p.city.toLowerCase().includes(city.toLowerCase()));
-      if (priceMax) filtered = filtered.filter(p => p.price <= parseInt(priceMax, 10));
-      if (bedrooms) filtered = filtered.filter(p => p.bedrooms >= parseInt(bedrooms, 10));
-      const slice = filtered.slice(0, opts.perPage || 12);
-      setResults(slice);
-      setTotal(filtered.length);
-      setPage(opts.page || 1);
-      cacheRef.current.set(cacheKey, { results: slice, total: filtered.length });
+      console.error('Search failed:', err);
+      setError('Failed to load properties. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -242,54 +217,141 @@ export default function SearchPanel() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
         gap: '2rem',
         alignItems: 'start'
       }}>
+        {/* Results Column */}
         <div>
           {loading && <p>Loading…</p>}
           {!loading && results.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>No results yet — try a search.</p>}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
             {results.map(p => (
               <div key={p.id}>
                 <PropertyCard property={p} onViewDetails={(prop) => setSelectedProperty(prop)} />
               </div>
             ))}
           </div>
+
           {total !== null && total > results.length && (
             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-              <button onClick={() => fetchResults({ page: page + 1 })} style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)' }}>Show more</button>
-            </div>
-          )}
-        </div>
-
-        <div style={{
-          position: 'sticky',
-          top: '120px',
-          height: 'fit-content'
-        }}>
-          <MapView properties={results} onMarkerClick={(p) => setSelectedProperty(p)} />
-
-          {/* Modal */}
-          {selectedProperty && (
-            <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--bg-primary)' }}>
-              <h3>
-                {selectedProperty.verified && <i className="fas fa-check-circle" style={{ color: 'var(--info)', marginRight: '0.5rem' }} title="Verified Listing"></i>}
-                {selectedProperty.title} — {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(selectedProperty.price)}
-              </h3>
-              <p style={{ color: 'var(--text-secondary)' }}>{selectedProperty.address} {selectedProperty.city ? '• ' + selectedProperty.city : ''}</p>
-              <p>{selectedProperty.description}</p>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
-                <button onClick={() => { addFavorite(selectedProperty.id); }} style={{ padding: '0.6rem 0.9rem', borderRadius: '8px', background: 'var(--accent)', color: 'white', border: 'none' }}>Add to Favorites</button>
-                <button onClick={() => { window.open(`https://wa.me/?text=I am interested in ${selectedProperty.title}`, '_blank'); }} style={{ padding: '0.6rem 0.9rem', borderRadius: '8px', border: 'none', background: 'var(--success)', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <i className="fab fa-whatsapp"></i> Contact Verified Agent
-                </button>
-                <button onClick={() => setSelectedProperty(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer' }}>Close</button>
-              </div>
+              <button
+                onClick={() => fetchResults({ page: page + 1 })}
+                style={{
+                  padding: '0.6rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                  background: 'var(--bg-primary)'
+                }}
+              >
+                Show more
+              </button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Details Modal (Centered Overlay instead of side panel) */}
+      {selectedProperty && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '1rem'
+        }} onClick={() => setSelectedProperty(null)}>
+          <div style={{
+            background: 'var(--bg-primary)',
+            padding: '2rem',
+            borderRadius: 'var(--radius-lg)',
+            maxWidth: '600px',
+            width: '100%',
+            position: 'relative',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ marginBottom: '1rem' }}>
+              <img
+                src={selectedProperty.images?.[0] || 'https://via.placeholder.com/600x400'}
+                alt={selectedProperty.title}
+                style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: 'var(--radius-md)' }}
+              />
+            </div>
+            <h3>
+              {selectedProperty.verified && <i className="fas fa-check-circle" style={{ color: 'var(--info)', marginRight: '0.5rem' }} title="Verified Listing"></i>}
+              {selectedProperty.title} — {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(selectedProperty.price)}
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>{selectedProperty.area}, {selectedProperty.city}</p>
+            <p style={{ marginBottom: '1.5rem', lineHeight: '1.6' }}>{selectedProperty.description}</p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem', marginBottom: '1.5rem', background: 'var(--bg-secondary)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+              <div><strong>{selectedProperty.bedrooms}</strong> Beds</div>
+              <div><strong>{selectedProperty.bathrooms}</strong> Baths</div>
+              <div><strong>{selectedProperty.sqft}</strong> Sq Ft</div>
+              <div><strong>{selectedProperty.propertyType}</strong></div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
+              <button
+                onClick={() => { addFavorite(selectedProperty.id); }}
+                style={{
+                  flex: 1,
+                  padding: '0.8rem',
+                  borderRadius: '8px',
+                  background: 'var(--bg-secondary)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-color)',
+                  fontWeight: '600'
+                }}
+              >
+                {/* Check if favorite logic would be nice here, but simple add is fine */}
+                <i className="far fa-heart" style={{ marginRight: '0.5rem' }}></i> Save
+              </button>
+              <button
+                onClick={() => { window.open(`https://wa.me/?text=I am interested in ${selectedProperty.title}`, '_blank'); }}
+                style={{
+                  flex: 2,
+                  padding: '0.8rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'var(--success)',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  fontWeight: '600'
+                }}
+              >
+                <i className="fab fa-whatsapp"></i> Contact Verified Agent
+              </button>
+            </div>
+            <button
+              onClick={() => setSelectedProperty(null)}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'rgba(0,0,0,0.1)',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

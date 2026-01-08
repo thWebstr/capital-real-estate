@@ -15,7 +15,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
-          'maps': ['@googlemaps/js-api-loader'],
+
         },
       },
     },

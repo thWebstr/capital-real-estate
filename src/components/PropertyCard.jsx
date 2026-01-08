@@ -283,7 +283,7 @@ export default function PropertyCard({ property, onViewDetails }) {
           }}
         >
           <i className="fas fa-map-marker-alt" style={{ marginTop: '0.2rem', color: 'var(--accent)' }}></i>
-          <span>{property.address}</span>
+          <span>{property.area}, {property.city}</span>
         </p>
 
         {/* Property Details */}
