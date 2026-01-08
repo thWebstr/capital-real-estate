@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useFilters } from '../contexts/FilterContext';
 
 export default function FilterPanel() {
-  const { filters, updateFilter, clearFilters, isFilterOpen, toggleFilter, closeFilter } = useFilters();
+  const { filters, updateFilter, clearFilters, isFilterOpen, closeFilter } = useFilters();
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
   const [expandedSections, setExpandedSections] = useState({
     price: true,
@@ -20,7 +20,6 @@ export default function FilterPanel() {
 
   const propertyTypes = ['House', 'Condo', 'Townhouse', 'Multi-Family'];
   const featuresList = ['Pool', 'Garage', 'Fireplace', 'Garden', 'Smart Home', 'Ocean View'];
-  const cities = ['Miami Beach', 'Chicago', 'Austin', 'Seattle', 'Malibu', 'Denver', 'Brooklyn', 'San Jose'];
 
   const formatPrice = (price) => {
     if (price >= 1000000) return `$${(price / 1000000).toFixed(1)}M`;

@@ -197,6 +197,7 @@ export default function MarketDashboard() {
       if (typeChartInstance.current) typeChartInstance.current.destroy();
       if (bedsChartInstance.current) bedsChartInstance.current.destroy();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredProperties]);
 
   const StatCard = ({ icon, value, label, color }) => (

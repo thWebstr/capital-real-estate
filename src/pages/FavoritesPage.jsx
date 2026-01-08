@@ -1,6 +1,6 @@
-import { useFavorites } from '../../contexts/FavoritesContext';
-import { properties } from '../../data/properties';
-import PropertyCard from '../PropertyCard';
+import { useFavorites } from '../contexts/FavoritesContext';
+import { properties } from '../data/properties';
+import PropertyCard from '../components/PropertyCard';
 
 export default function FavoritesPage() {
   const { favorites, clearFavorites } = useFavorites();

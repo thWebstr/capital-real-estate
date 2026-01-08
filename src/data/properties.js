@@ -262,6 +262,132 @@ export const properties = [
     },
     lat: 37.3382,
     lng: -121.8863
+  },
+  {
+    id: 9,
+    title: "Suburban Ranch Retreat",
+    price: 349000,
+    address: "242 Oak Meadow Drive, Raleigh, NC",
+    city: "Raleigh",
+    state: "NC",
+    zip: "27601",
+    bedrooms: 3,
+    bathrooms: 2,
+    sqft: 1800,
+    lotSize: 7500,
+    yearBuilt: 1998,
+    propertyType: "House",
+    status: "For Sale",
+    daysOnMarket: 14,
+    hoa: 0,
+    features: ["Fenced Yard", "Garage", "Open Floor Plan"],
+    description: "Cozy ranch home on a quiet street with a large backyard and updated kitchen.",
+    images: [
+      "https://images.unsplash.com/photo-1560184897-6e2f3f0a3b3f?w=800",
+      "https://images.unsplash.com/photo-1560448281-1eafbd6874d9?w=800"
+    ],
+    agent: {
+      name: "Laura Kim",
+      phone: "(919) 555-0909",
+      email: "laura.k@capitalre.com",
+      photo: "https://i.pravatar.cc/150?img=15"
+    },
+    lat: 35.7796,
+    lng: -78.6382
+  },
+  {
+    id: 10,
+    title: "City Center Loft",
+    price: 412000,
+    address: "88 Market Street, Unit 5B, Portland, OR",
+    city: "Portland",
+    state: "OR",
+    zip: "97205",
+    bedrooms: 1,
+    bathrooms: 1,
+    sqft: 850,
+    lotSize: null,
+    yearBuilt: 2010,
+    propertyType: "Condo",
+    status: "For Sale",
+    daysOnMarket: 22,
+    hoa: 275,
+    features: ["City View", "High Ceilings", "On-site Laundry"],
+    description: "Stylish loft with exposed brick and modern finishes in the heart of the city.",
+    images: [
+      "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=800",
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800"
+    ],
+    agent: {
+      name: "Chris Nolan",
+      phone: "(503) 555-0666",
+      email: "chris.n@capitalre.com",
+      photo: "https://i.pravatar.cc/150?img=16"
+    },
+    lat: 45.5152,
+    lng: -122.6784
+  },
+  {
+    id: 11,
+    title: "Fixer-Upper Opportunity",
+    price: 189000,
+    address: "14 Elm Street, Columbus, OH",
+    city: "Columbus",
+    state: "OH",
+    zip: "43085",
+    bedrooms: 3,
+    bathrooms: 1.5,
+    sqft: 1400,
+    lotSize: 5000,
+    yearBuilt: 1940,
+    propertyType: "House",
+    status: "For Sale",
+    daysOnMarket: 65,
+    hoa: 0,
+    features: ["Needs TLC", "Great Bones", "Investor Special"],
+    description: "Solid structure in a convenient location — ideal for renovation and value-add investors.",
+    images: [
+      "https://images.unsplash.com/photo-1600585154775-5c1e55d9d0f9?w=800"
+    ],
+    agent: {
+      name: "Olivia Park",
+      phone: "(614) 555-0199",
+      email: "olivia.p@capitalre.com",
+      photo: "https://i.pravatar.cc/150?img=17"
+    },
+    lat: 39.9612,
+    lng: -82.9988
+  },
+  {
+    id: 12,
+    title: "Lakefront Cottage",
+    price: 785000,
+    address: "77 Lakeside Drive, Lake Tahoe, CA",
+    city: "Lake Tahoe",
+    state: "CA",
+    zip: "96150",
+    bedrooms: 3,
+    bathrooms: 2,
+    sqft: 1500,
+    lotSize: 8000,
+    yearBuilt: 1995,
+    propertyType: "House",
+    status: "For Sale",
+    daysOnMarket: 9,
+    hoa: 0,
+    features: ["Lake Access", "Deck", "Fireplace"],
+    description: "Charming cottage with private access to the lake and stunning views — perfect getaway or year-round home.",
+    images: [
+      "https://images.unsplash.com/photo-1505691723518-36a3a7a6f3e3?w=800"
+    ],
+    agent: {
+      name: "Ethan Wright",
+      phone: "(530) 555-0345",
+      email: "ethan.w@capitalre.com",
+      photo: "https://i.pravatar.cc/150?img=18"
+    },
+    lat: 39.0968,
+    lng: -120.0324
   }
 ];
 

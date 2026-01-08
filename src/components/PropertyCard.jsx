@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useFavorites } from '../contexts/FavoritesContext';
 
-export default function PropertyCard({ property }) {
+export default function PropertyCard({ property, onViewDetails }) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -390,6 +390,7 @@ export default function PropertyCard({ property }) {
           }}
         >
           <button
+            type="button"
             style={{
               background: 'var(--accent)',
               color: 'white',
@@ -404,6 +405,7 @@ export default function PropertyCard({ property }) {
               justifyContent: 'center',
               gap: '0.5rem',
             }}
+            onClick={(e) => { e.stopPropagation(); if (typeof onViewDetails === 'function') onViewDetails(property); }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'var(--accent-dark)';
               e.currentTarget.style.transform = 'translateY(-2px)';

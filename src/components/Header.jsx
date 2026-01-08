@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useFilters } from '../contexts/FilterContext';
 
 export default function Header() {
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
   const { favoritesCount } = useFavorites();
   const { searchQuery, setSearchQuery, isFilterOpen, toggleFilter, closeFilter } = useFilters();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -274,7 +275,9 @@ export default function Header() {
           gap: '1rem'
         }}>
           {/* Favorites */}
-          <button
+          <Link
+            to="/favorites"
+            aria-label={`Favorites (${favoritesCount})`}
             style={{
               position: 'relative',
               background: 'var(--bg-secondary)',
@@ -286,7 +289,8 @@ export default function Header() {
               alignItems: 'center',
               gap: '0.5rem',
               transition: 'all var(--transition-fast)',
-              color: 'var(--text-primary)'
+              color: 'var(--text-primary)',
+              textDecoration: 'none'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'var(--accent)';
@@ -301,7 +305,7 @@ export default function Header() {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            <i className="fas fa-heart" style={{ fontSize: '1.1rem' }}></i>
+            <i className="fas fa-heart" style={{ fontSize: '1.1rem' }} aria-hidden="true"></i>
             {!isMobile && (
               <span style={{ fontWeight: '500' }}>
                 Favorites
@@ -324,7 +328,7 @@ export default function Header() {
                 {favoritesCount}
               </span>
             )}
-          </button>
+          </Link>
 
           {/* Theme Toggle */}
           <button
@@ -427,9 +431,16 @@ export default function Header() {
             flexDirection: 'column',
             gap: '0.5rem'
           }}>
-            {['Home', 'Blog', 'About', 'Contact'].map((label) => (
-              <button
-                key={label}
+            {[
+              { label: 'Home', to: '/' },
+              { label: 'Blog', to: '/blog' },
+              { label: 'Favorites', to: '/favorites' },
+              { label: 'About', to: '/about' },
+              { label: 'Contact', to: '/contact' },
+            ].map(({ label, to }) => (
+              <Link
+                key={to}
+                to={to}
                 onClick={() => { setIsMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 style={{
                   padding: '1rem',
@@ -444,11 +455,12 @@ export default function Header() {
                   alignItems: 'center',
                   gap: '0.75rem',
                   fontSize: '1rem',
-                  textAlign: 'left'
+                  textAlign: 'left',
+                  textDecoration: 'none'
                 }}
               >
                 {label}
-              </button>
+              </Link>
             ))}
           </nav>
 

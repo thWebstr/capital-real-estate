@@ -1,25 +1,94 @@
 import { useState, useRef, useEffect } from 'react';
+import { useFavorites } from '../contexts/FavoritesContext';
 
 export default function AIAssistant() {
+  const { addFavorite } = useFavorites();
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: `msg-${Date.now()}`,
       role: 'assistant',
-      content: 'Hi! I\'m your AI real estate assistant. I can help you find properties, calculate mortgages, analyze investments, and answer any questions about home buying. How can I help you today?'
+      content: 'Hello — I\'m your Capital Real Estate assistant. I can help you discover properties, calculate mortgages, analyze markets, and book tours. Tell me what you\'re looking for (e.g., "properties under $500k in Austin", or "calculate mortgage for $400k, 10% down").'
     }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const toggleButtonRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // For property search pagination
+  const [lastResults, setLastResults] = useState([]);
+  const [resultsPage, setResultsPage] = useState(0);
+  const pageSize = 3; // items per page for assistant responses
+  const [selectedProperty, setSelectedProperty] = useState(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Utility helpers
+  const formatCurrency = (n) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+  const parsePriceFromText = (text) => {
+    const match = text.match(/\$?([\d,]+(?:\.\d+)?)\s*(k|m|thousand|million)?/i);
+    if (!match) return null;
+    let num = parseFloat(match[1].replace(/,/g, ''));
+    if (match[2] && match[2].toLowerCase().startsWith('m')) num *= 1000000;
+    else if (match[2] && match[2].toLowerCase().startsWith('k')) num *= 1000;
+    return num;
+  };
+
+  const calculateMortgage = (principal, downPct, annualRate, years) => {
+    const downPayment = principal * (downPct / 100);
+    const loanAmount = principal - downPayment;
+    const monthlyRate = annualRate / 100 / 12;
+    const numPayments = years * 12;
+    const monthlyPayment = (loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments))) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+    return {
+      principal,
+      downPayment,
+      annualRate,
+      years,
+      monthly: isFinite(monthlyPayment) ? monthlyPayment : 0,
+    };
+  };
+
+  const searchProperties = ({ priceMax: _priceMax, city: _city, bedrooms: _bedrooms } = {}) => {
+    // Mock search using sample data (in real app, would query backend)
+    return [];
+  };
+
+
+
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Focus the input when opening
+      setTimeout(() => inputRef.current?.focus(), 0);
+      const onKey = (e) => {
+        if (e.key === 'Escape') setIsOpen(false);
+      };
+      document.addEventListener('keydown', onKey);
+      return () => document.removeEventListener('keydown', onKey);
+    } else {
+      // Return focus to toggle button when closed
+      setTimeout(() => toggleButtonRef.current?.focus(), 0);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (selectedProperty) {
+      const onKey = (e) => { if (e.key === 'Escape') setSelectedProperty(null); };
+      document.addEventListener('keydown', onKey);
+      return () => document.removeEventListener('keydown', onKey);
+    }
+  }, [selectedProperty]);
 
   const quickActions = [
     { icon: 'fa-search', text: 'Find properties', action: 'Show me properties under $500K' },
@@ -38,25 +107,87 @@ export default function AIAssistant() {
 
     // Simulate AI response (In production, this would call the Anthropic API)
     setTimeout(() => {
-      let response = '';
-
       const lowerMsg = userMessage.toLowerCase();
 
-      if (lowerMsg.includes('mortgage') || lowerMsg.includes('calculate')) {
-        response = 'I can help you calculate your mortgage! For a typical scenario:\n\n• $400,000 home price\n• 20% down payment ($80,000)\n• 6.5% interest rate\n• 30-year term\n\nYour monthly payment would be approximately $2,024/month (principal & interest only).\n\nWould you like me to include property taxes, insurance, and HOA fees for a more accurate estimate?';
-      } else if (lowerMsg.includes('property') || lowerMsg.includes('home') || lowerMsg.includes('house')) {
-        response = 'Based on your search criteria, I found several excellent properties:\n\n1. **Charming Family Home** - $425K\n   • 4 beds, 3 baths, 2,800 sqft\n   • Austin, TX\n   • Great school district\n\n2. **Modern Smart Home** - $695K\n   • 3 beds, 2.5 baths, 2,200 sqft\n   • San Jose, CA\n   • Solar panels & EV charger\n\nWould you like more details on any of these properties?';
-      } else if (lowerMsg.includes('market') || lowerMsg.includes('trend')) {
-        response = 'Current market insights:\n\n📈 **Market Trends:**\n• Average home price: $828K\n• Median days on market: 18 days\n• Inventory: Properties moving quickly\n\n💡 **Key Observations:**\n• Homes under $500K are selling 30% faster\n• Properties with modern amenities are in high demand\n• Interest rates remain stable at 6-7%\n\nThis is generally a competitive market. Would you like tips on making a strong offer?';
-      } else if (lowerMsg.includes('value') || lowerMsg.includes('deal')) {
-        response = 'Great question! Here are the best value properties I found:\n\n🏆 **Top Deals:**\n\n1. **Charming Family Home** - $425K\n   • Price per sqft: $152\n   • 15% below market average\n   • Recently updated kitchen\n\n2. **Contemporary Townhouse** - $550K\n   • Price per sqft: $282\n   • Walk to restaurants & shops\n   • Low HOA fees\n\nThese properties offer excellent value based on location, amenities, and recent comparable sales. Want to schedule tours?';
-      } else {
-        response = 'I\'d be happy to help with that! I can assist you with:\n\n• 🏠 Finding properties that match your criteria\n• 💰 Calculating mortgages and affordability\n• 📊 Analyzing market trends and property values\n• 📍 Information about neighborhoods and schools\n• 🤝 Connecting you with agents\n• 📅 Scheduling property tours\n\nWhat would you like to know more about?';
+      // SHOW MORE handling: paginate last results
+      if (lowerMsg.includes('show more') || lowerMsg.includes('more properties')) {
+        if (!lastResults || lastResults.length === 0) {
+          setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', content: 'No previous results to show more of — try asking for properties (e.g., "properties under $500k")' }]);
+          setIsTyping(false);
+          return;
+        }
+
+        const nextPage = resultsPage + 1;
+        const start = nextPage * pageSize;
+        const slice = lastResults.slice(start, start + pageSize);
+
+        if (slice.length === 0) {
+          setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', content: 'That\'s all the results I have for that query. Try broadening your criteria.' }]);
+          setIsTyping(false);
+          return;
+        }
+
+        setResultsPage(nextPage);
+        setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', type: 'list', content: slice }]);
+        setIsTyping(false);
+        return;
       }
 
-      setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', content: response }]);
+      // Mortgage parsing
+      if (lowerMsg.includes('mortgage') || lowerMsg.includes('calculate')) {
+        const price = parsePriceFromText(userMessage) || 400000;
+        const downMatch = userMessage.match(/(\d+)%\s*(down)?/i);
+        const downPct = downMatch ? parseFloat(downMatch[1]) : 20;
+        const rateMatch = userMessage.match(/(\d+(?:\.\d+)?)%/i);
+        const rate = rateMatch ? parseFloat(rateMatch[1]) : 6.5;
+        const termMatch = userMessage.match(/(\d+)\s*-?\s*year/i);
+        const years = termMatch ? parseInt(termMatch[1], 10) : 30;
+
+        const result = calculateMortgage(price, downPct, rate, years);
+        const text = `Mortgage estimate for ${formatCurrency(price)} (Down: ${downPct}% — ${formatCurrency(result.downPayment)}):\n• Loan amount: ${formatCurrency(result.principal)}\n• Rate: ${result.annualRate}% | Term: ${result.years} years\n• Estimated monthly payment (P&I): ${formatCurrency(result.monthly)}/month\n\nWould you like a breakdown including taxes and insurance?`;
+        setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', content: text }]);
+        setIsTyping(false);
+        return;
+      }
+
+      // Property search parsing (price, city, bedrooms)
+      if (lowerMsg.includes('property') || lowerMsg.includes('properties') || lowerMsg.includes('show') || lowerMsg.includes('find') || lowerMsg.includes('homes') || lowerMsg.includes('homes in')) {
+        const price = parsePriceFromText(userMessage);
+        let city = '';
+        const cityMatch = userMessage.match(/in\s+([a-zA-Z\s]+)/i);
+        if (cityMatch) city = cityMatch[1].trim().replace(/\.$/, '');
+        const bedsMatch = userMessage.match(/(\d+)\s*(?:bed|beds|br)/i);
+        const bedrooms = bedsMatch ? parseInt(bedsMatch[1], 10) : null;
+
+        const results = searchProperties({ priceMax: price, city, bedrooms });
+        setLastResults(results);
+        setResultsPage(0);
+
+        if (results.length === 0) {
+          setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', content: 'I couldn\'t find any properties matching that criteria. Try widening the price range or removing the city.' }]);
+          setIsTyping(false);
+          return;
+        }
+
+        const slice = results.slice(0, pageSize);
+        setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', type: 'list', content: slice }]);
+        setIsTyping(false);
+        return;
+      }
+
+      // Market or other
+      if (lowerMsg.includes('market') || lowerMsg.includes('trend')) {
+        const response = 'Market snapshot:\n• Average home price: $828,000\n• Median days on market: 18\n• Inventory: Competitive — homes under $500k are moving faster.\n\nI can pull comparable sales or show properties in a specific city if you\'d like.';
+        setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', content: response }]);
+        setIsTyping(false);
+        return;
+      }
+
+      // Fallback professional reply
+      const fallback = 'I\'m here to help — you can ask me to find properties (e.g., "Properties under $500k in Austin"), calculate a mortgage ("Calculate mortgage for $400k"), or request market insights. What would you like to do?';
+      setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', content: fallback }]);
       setIsTyping(false);
-    }, 1500);
+    }, 900);
   };
 
   const handleQuickAction = (action) => {
@@ -68,7 +199,12 @@ export default function AIAssistant() {
     <>
       {/* Chat Widget Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={toggleButtonRef}
+        type="button"
+        aria-label={isOpen ? 'Close AI assistant' : 'Open AI assistant'}
+        aria-expanded={isOpen}
+        aria-controls="ai-assistant-panel"
+        onClick={() => setIsOpen(prev => !prev)}
         style={{
           position: 'fixed',
           bottom: '2rem',
@@ -89,6 +225,7 @@ export default function AIAssistant() {
           zIndex: 'var(--z-fixed)',
           animation: 'glow 2s ease-in-out infinite',
         }}
+        onKeyDown={(e) => { if (e.key === 'Escape' && isOpen) setIsOpen(false); }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.1) rotate(10deg)';
         }}
@@ -96,7 +233,7 @@ export default function AIAssistant() {
           e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
         }}
       >
-        <i className={isOpen ? 'fas fa-times' : 'fas fa-robot'}></i>
+        <i className={isOpen ? 'fas fa-times' : 'fas fa-robot'} aria-hidden="true"></i>
         {!isOpen && (
           <div style={{
             position: 'absolute',
@@ -120,7 +257,7 @@ export default function AIAssistant() {
 
       {/* Chat Panel */}
       {isOpen && (
-        <div style={{
+        <div id="ai-assistant-panel" role="dialog" aria-modal="true" aria-labelledby="ai-assistant-title" style={{
           position: 'fixed',
           bottom: '100px',
           right: '2rem',
@@ -157,10 +294,10 @@ export default function AIAssistant() {
               justifyContent: 'center',
               fontSize: '1.25rem',
             }}>
-              <i className="fas fa-robot"></i>
+              <i className="fas fa-robot" aria-hidden="true"></i>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: '700', fontSize: '1.1rem' }}>AI Assistant</div>
+              <div id="ai-assistant-title" style={{ fontWeight: '700', fontSize: '1.1rem' }}>AI Assistant</div>
               <div style={{ fontSize: '0.85rem', opacity: 0.9 }}>
                 {isTyping ? 'Typing...' : 'Online'}
               </div>
@@ -168,7 +305,7 @@ export default function AIAssistant() {
           </div>
 
           {/* Messages */}
-          <div style={{
+          <div id="ai-assistant-messages" role="log" aria-live="polite" aria-atomic="false" style={{
             flex: 1,
             overflowY: 'auto',
             padding: '1.5rem',
@@ -200,7 +337,34 @@ export default function AIAssistant() {
                   whiteSpace: 'pre-wrap',
                   boxShadow: 'var(--shadow-sm)',
                 }}>
-                  {msg.content}
+                  {msg.type === 'list' ? (
+                    <div style={{ display: 'grid', gap: '0.75rem' }}>
+                      {msg.content.map((p) => (
+                        <div key={p.id} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                          <img src={p.images?.[0] || p.thumbnail || 'https://via.placeholder.com/120'} alt={p.title} style={{ width: '86px', height: '64px', objectFit: 'cover', borderRadius: '8px' }} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{ fontWeight: '700' }}>{p.title}</div>
+                              <div style={{ fontWeight: '800' }}>{formatCurrency(p.price)}</div>
+                            </div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{p.bedrooms} bd • {p.bathrooms} ba • {p.sqft} sqft • {p.city}</div>
+                            <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                              <button type="button" onClick={() => setSelectedProperty(p)} style={{ padding: '0.35rem 0.65rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', cursor: 'pointer' }} aria-label={`Details for ${p.title}`}>Details</button>
+                              <button type="button" onClick={() => {
+                                addFavorite(p.id);
+                                setMessages(prev => [...prev, { id: `msg-${Date.now()}-${Math.random()}`, role: 'assistant', content: `${p.title} has been added to your favorites.` }]);
+                              }} style={{ padding: '0.35rem 0.65rem', borderRadius: '8px', border: 'none', background: 'var(--accent)', color: 'white', cursor: 'pointer' }}>Add to Favorites</button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {(msg.content.length < lastResults.length || (resultsPage + 1) * pageSize < lastResults.length) && (
+                        <button type="button" onClick={() => { setInputValue('show more'); setTimeout(() => handleSend(), 50); }} style={{ padding: '0.5rem 0.85rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', cursor: 'pointer', marginTop: '0.5rem' }}>Show more</button>
+                      )}
+                    </div>
+                  ) : (
+                    msg.content
+                  )}
                 </div>
               </div>
             ))}
@@ -255,6 +419,8 @@ export default function AIAssistant() {
               {quickActions.map((action) => (
                 <button
                   key={action.action}
+                  type="button"
+                  aria-label={`Quick action: ${action.text}`}
                   onClick={() => handleQuickAction(action.action)}
                   style={{
                     background: 'var(--bg-secondary)',
@@ -300,11 +466,20 @@ export default function AIAssistant() {
               alignItems: 'center',
             }}>
               <input
+                ref={inputRef}
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  } else if (e.key === 'Escape') {
+                    setIsOpen(false);
+                  }
+                }}
                 placeholder="Type your message..."
+                aria-label="Message"
                 style={{
                   flex: 1,
                   padding: '0.75rem 1rem',
@@ -316,7 +491,9 @@ export default function AIAssistant() {
                 }}
               />
               <button
+                type="button"
                 onClick={handleSend}
+                aria-label="Send message"
                 disabled={!inputValue.trim() || isTyping}
                 style={{
                   width: '44px',
@@ -343,12 +520,46 @@ export default function AIAssistant() {
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                <i className="fas fa-paper-plane"></i>
+                <i className="fas fa-paper-plane" aria-hidden="true"></i>
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Property Details Modal */}
+      {selectedProperty && (
+        <div role="dialog" aria-modal="true" aria-labelledby="property-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 'calc(var(--z-fixed) + 1)' }} onClick={() => setSelectedProperty(null)}>
+          <div role="document" style={{ width: 'min(900px, 95vw)', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-primary)', borderRadius: 'var(--radius-lg)', padding: '1.25rem', boxShadow: 'var(--shadow-xl)' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+              <div style={{ flex: '0 0 320px' }}>
+                <img src={selectedProperty.images?.[0] || 'https://via.placeholder.com/320x200'} alt={selectedProperty.title} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px' }} />
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  {selectedProperty.images?.slice(0, 3).map((src, idx) => (<img key={idx} src={src} alt={selectedProperty.title + ' photo ' + (idx + 1)} style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />))}
+                </div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h2 id="property-title" style={{ margin: 0 }}>{selectedProperty.title}</h2>
+                  <div style={{ fontWeight: '800' }}>{formatCurrency(selectedProperty.price)}</div>
+                </div>
+                <p style={{ margin: '0.5rem 0', color: 'var(--text-secondary)' }}>{selectedProperty.address || ''} {selectedProperty.city ? '• ' + selectedProperty.city : ''}</p>
+                <p style={{ margin: '0.25rem 0' }}>{selectedProperty.bedrooms} bd • {selectedProperty.bathrooms} ba • {selectedProperty.sqft} sqft</p>
+                <p style={{ marginTop: '1rem', color: 'var(--text-primary)' }}>{selectedProperty.description}</p>
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                  <button type="button" onClick={() => { addFavorite(selectedProperty.id); }} style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--accent)', color: 'white', border: 'none' }}>Add to Favorites</button>
+                  <button type="button" onClick={() => { setMessages(prev => [...prev, { id: `msg-${Date.now()}`, role: 'user', content: `I want to schedule a tour for ${selectedProperty.title} (id: ${selectedProperty.id})` }]); setSelectedProperty(null); setIsOpen(true); }} style={{ padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)' }}>Request Tour</button>
+                  <button type="button" onClick={() => setSelectedProperty(null)} aria-label="Close details" style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem' }}>Close</button>
+                </div>
+                <div style={{ marginTop: '0.75rem', color: 'var(--text-secondary)' }}>
+                  Agent: {selectedProperty.agent?.name} • <a href={`mailto:${selectedProperty.agent?.email}`}>{selectedProperty.agent?.email}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }

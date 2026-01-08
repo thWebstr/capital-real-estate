@@ -3,6 +3,7 @@ import Hero from '../components/Hero';
 import PropertyList from '../components/PropertyList';
 import FilterPanel from '../components/FilterPanel';
 import MarketDashboard from '../components/MarketDashboard';
+import SearchPanel from '../components/SearchPanel';
 
 export default function HomePage() {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -39,6 +40,9 @@ export default function HomePage() {
                 Market Insights
               </button>
             </div>
+
+            {/* Search + Map integration */}
+            <SearchPanel />
 
             {showDashboard ? <MarketDashboard /> : <PropertyList />}
           </div>

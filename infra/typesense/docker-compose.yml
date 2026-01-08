@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  typesense:
+    image: typesense/typesense:0.25.0
+    command: typesense-server --api-key=${TYPESENSE_API_KEY:-xyz} --data-dir /data --listen-port 8108
+    ports:
+      - "8108:8108"
+    volumes:
+      - typesense-data:/data
+    restart: unless-stopped
+
+volumes:
+  typesense-data:
+    driver: local

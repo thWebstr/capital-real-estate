@@ -9,8 +9,10 @@ import { FavoritesProvider } from './contexts/FavoritesContext';
 import { Routes, Route } from 'react-router-dom';
 
 import HomePage from './pages/HomePage';
-import ContactPage from './pages/ContactPage';
 import BlogPage from './pages/BlogPage';
+import ContactPage from './pages/ContactPage';
+import AboutPage from './pages/AboutPage';
+import FavoritesPage from './pages/FavoritesPage';
 
 import './styles/global.css';
 
@@ -26,6 +28,8 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/blog" element={<BlogPage />} />
+              <Route path="/favorites" element={<FavoritesPage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
             </Routes>
 
