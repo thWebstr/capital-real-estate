@@ -16,10 +16,7 @@ export default function PropertyList() {
   }
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 360px))',
-      gap: '1.5rem',
+    <div className="property-grid" style={{
       justifyContent: 'center',
       width: '100%'
     }}>

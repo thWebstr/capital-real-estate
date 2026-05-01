@@ -347,7 +347,7 @@ export default function PropertyCard({ property, onViewDetails }) {
             marginBottom: '1.5rem',
           }}
         >
-          {property.features.slice(0, 3).map((feature) => (
+          {(property.features || []).slice(0, 3).map((feature) => (
             <span
               key={feature}
               style={{
@@ -362,7 +362,7 @@ export default function PropertyCard({ property, onViewDetails }) {
               {feature}
             </span>
           ))}
-          {property.features.length > 3 && (
+          {(property.features || []).length > 3 && (
             <span
               style={{
                 background: 'var(--accent)',
@@ -373,7 +373,7 @@ export default function PropertyCard({ property, onViewDetails }) {
                 fontWeight: '600',
               }}
             >
-              +{property.features.length - 3}
+              +{(property.features || []).length - 3}
             </span>
           )}
         </div>

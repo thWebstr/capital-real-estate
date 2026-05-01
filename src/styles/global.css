@@ -136,6 +136,21 @@ body {
   overflow-x: hidden;
 }
 
+.listing-grid,
+.property-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 980px) {
+
+  .listing-grid,
+  .property-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* === TYPOGRAPHY === */
 h1,
 h2,

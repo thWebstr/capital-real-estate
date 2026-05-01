@@ -226,7 +226,7 @@ export default function SearchPanel() {
           {loading && <p>Loading…</p>}
           {!loading && results.length === 0 && <p style={{ color: 'var(--text-secondary)' }}>No results yet — try a search.</p>}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          <div className="listing-grid">
             {results.map(p => (
               <div key={p.id}>
                 <PropertyCard property={p} onViewDetails={(prop) => setSelectedProperty(prop)} />
@@ -327,7 +327,7 @@ export default function SearchPanel() {
                   fontWeight: '600'
                 }}
               >
-                <i className="fab fa-whatsapp"></i> Contact Verified Agent
+                <i className="fab fa-whatsapp"></i> Contact Agent
               </button>
             </div>
             <button

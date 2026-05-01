@@ -2,15 +2,24 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const FavoritesContext = createContext();
 
+function safeJSONParse(value, fallback) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
 export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem('favorites');
-    return saved ? JSON.parse(saved) : [];
+    return safeJSONParse(saved, []);
   });
 
   const [notes, setNotes] = useState(() => {
     const saved = localStorage.getItem('propertyNotes');
-    return saved ? JSON.parse(saved) : {};
+    return safeJSONParse(saved, {});
   });
 
   useEffect(() => {

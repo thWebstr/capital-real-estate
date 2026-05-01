@@ -28,10 +28,10 @@ export default function HomePage() {
             {/* Header / Title for the listing section */}
             <div style={{ marginBottom: '1.5rem' }}>
               <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                Latest Verified Listings
+                Latest Listings
               </h2>
               <p style={{ color: 'var(--text-secondary)' }}>
-                Browse verified properties in your area.
+                Browse properties in your area.
               </p>
             </div>
 

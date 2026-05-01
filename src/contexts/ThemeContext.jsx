@@ -2,17 +2,28 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
+function safeJSONParse(value, fallback) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    // Check localStorage first
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) return savedTheme;
-    
-    // Check system preference
+    if (savedTheme) {
+      const themeValue = safeJSONParse(savedTheme, null);
+      if (themeValue) return themeValue;
+      return savedTheme;
+    }
+
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
-    
+
     return 'light';
   });
 

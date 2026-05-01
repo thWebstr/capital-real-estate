@@ -58,7 +58,7 @@ export default function Footer() {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <i className="fas fa-check-circle" style={{ color: 'white', fontSize: '1.25rem' }}></i>
+                <i className="fas fa-home" style={{ color: 'white', fontSize: '1.25rem' }}></i>
               </div>
               <div>
                 <h3 style={{
@@ -70,7 +70,7 @@ export default function Footer() {
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
                 }}>
-                  Verified
+                  Capital
                 </h3>
                 <p style={{
                   fontSize: '0.7rem',
@@ -79,7 +79,7 @@ export default function Footer() {
                   fontWeight: '600',
                   letterSpacing: '1px',
                 }}>
-                  HOMES
+                  Real Estate
                 </p>
               </div>
             </div>
@@ -89,7 +89,7 @@ export default function Footer() {
               lineHeight: '1.6',
               marginBottom: '1.5rem',
             }}>
-              Verified properties only. No fake listings, no stress.
+              Capital Real Estate properties only. No fake listings, no stress.
               Find your next home with confidence.
             </p>
             {/* Social Links */}
@@ -353,7 +353,7 @@ export default function Footer() {
             fontSize: '0.9rem',
             margin: 0,
           }}>
-            © {currentYear} Verified Homes. All rights reserved.
+            © {currentYear} Capital Real Estate. All rights reserved.
           </p>
           <div style={{
             display: 'flex',

@@ -3,10 +3,19 @@ import { properties } from '../data/properties';
 
 const FilterContext = createContext();
 
+function safeJSONParse(value, fallback) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
 export function FilterProvider({ children }) {
   const [filters, setFilters] = useState(() => {
     const saved = localStorage.getItem('propertyFilters');
-    return saved ? JSON.parse(saved) : {
+    return safeJSONParse(saved, {
       priceMin: 0,
       priceMax: 10000000,
       bedrooms: null,
@@ -15,7 +24,7 @@ export function FilterProvider({ children }) {
       features: [],
       cities: [],
       sortBy: 'newest'
-    };
+    });
   });
 
   const [filteredProperties, setFilteredProperties] = useState(properties);
